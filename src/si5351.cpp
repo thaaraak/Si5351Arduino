@@ -33,9 +33,11 @@
 /* Public functions */
 /********************/
 
-Si5351::Si5351(uint8_t i2c_addr):
+Si5351::Si5351(TwoWire *theWire, uint8_t i2c_addr):
 	i2c_bus_addr(i2c_addr)
 {
+	_wire = theWire;
+
 	xtal_freq[0] = SI5351_XTAL_FREQ;
 
 	// Start by using XO ref osc as default for each PLL
@@ -60,15 +62,15 @@ Si5351::Si5351(uint8_t i2c_addr):
  * I2C address.
  *
  */
-bool Si5351::init(uint8_t xtal_load_c, uint32_t xo_freq, int32_t corr)
+bool Si5351::init( uint8_t xtal_load_c, uint32_t xo_freq, int32_t corr)
 {
 	// Start I2C comms
-	Wire.begin();
+	_wire->begin();
 
 	// Check for a device on the bus, bail out if it is not there
-	Wire.beginTransmission(i2c_bus_addr);
+	_wire->beginTransmission(i2c_bus_addr);
 	uint8_t reg_val;
-  reg_val = Wire.endTransmission();
+  reg_val = _wire->endTransmission();
 
 	if(reg_val == 0)
 	{
@@ -1309,37 +1311,37 @@ void Si5351::set_ref_freq(uint32_t ref_freq, enum si5351_pll_input ref_osc)
 
 uint8_t Si5351::si5351_write_bulk(uint8_t addr, uint8_t bytes, uint8_t *data)
 {
-	Wire.beginTransmission(i2c_bus_addr);
-	Wire.write(addr);
+	_wire->beginTransmission(i2c_bus_addr);
+	_wire->write(addr);
 	for(int i = 0; i < bytes; i++)
 	{
-		Wire.write(data[i]);
+		_wire->write(data[i]);
 	}
-	return Wire.endTransmission();
+	return _wire->endTransmission();
 
 }
 
 uint8_t Si5351::si5351_write(uint8_t addr, uint8_t data)
 {
-	Wire.beginTransmission(i2c_bus_addr);
-	Wire.write(addr);
-	Wire.write(data);
-	return Wire.endTransmission();
+	_wire->beginTransmission(i2c_bus_addr);
+	_wire->write(addr);
+	_wire->write(data);
+	return _wire->endTransmission();
 }
 
 uint8_t Si5351::si5351_read(uint8_t addr)
 {
 	uint8_t reg_val = 0;
 
-	Wire.beginTransmission(i2c_bus_addr);
-	Wire.write(addr);
-	Wire.endTransmission();
+	_wire->beginTransmission(i2c_bus_addr);
+	_wire->write(addr);
+	_wire->endTransmission();
 
-	Wire.requestFrom(i2c_bus_addr, (uint8_t)1, (uint8_t)false);
+	_wire->requestFrom(i2c_bus_addr, (uint8_t)1, (uint8_t)false);
 
-	while(Wire.available())
+	while(_wire->available())
 	{
-		reg_val = Wire.read();
+		reg_val = _wire->read();
 	}
 
 	return reg_val;

@@ -279,7 +279,7 @@ struct Si5351IntStatus
 class Si5351
 {
 public:
-  Si5351(uint8_t i2c_addr = SI5351_BUS_BASE_ADDR);
+  Si5351(TwoWire *theWire = &Wire, uint8_t i2c_addr = SI5351_BUS_BASE_ADDR);
 	bool init(uint8_t, uint32_t, int32_t);
 	void reset(void);
 	uint8_t set_freq(uint64_t, enum si5351_clock);
@@ -317,7 +317,10 @@ public:
   enum si5351_pll_input plla_ref_osc;
   enum si5351_pll_input pllb_ref_osc;
 	uint32_t xtal_freq[2];
+
 private:
+
+	TwoWire *_wire;
 	uint64_t pll_calc(enum si5351_pll, uint64_t, struct Si5351RegSet *, int32_t, uint8_t);
 	uint64_t multisynth_calc(uint64_t, uint64_t, struct Si5351RegSet *);
 	uint64_t multisynth67_calc(uint64_t, uint64_t, struct Si5351RegSet *);
