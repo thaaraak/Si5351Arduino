@@ -302,6 +302,9 @@ public:
 	void set_clock_fanout(enum si5351_clock_fanout, uint8_t);
 	void set_pll_input(enum si5351_pll, enum si5351_pll_input);
 	void set_vcxo(uint64_t, uint8_t);
+	
+	void print(uint64_t value);
+
   void set_ref_freq(uint32_t, enum si5351_pll_input);
 	uint8_t si5351_write_bulk(uint8_t, uint8_t, uint8_t *);
 	uint8_t si5351_write(uint8_t, uint8_t);

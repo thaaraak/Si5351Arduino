@@ -452,6 +452,7 @@ uint8_t Si5351::set_freq(uint64_t freq, enum si5351_clock clk)
  */
 uint8_t Si5351::set_freq_manual(uint64_t freq, uint64_t pll_freq, enum si5351_clock clk)
 {
+	
 	struct Si5351RegSet ms_reg;
 	uint8_t int_mode = 0;
 	uint8_t div_by_4 = 0;
@@ -1372,6 +1373,7 @@ uint64_t Si5351::pll_calc(enum si5351_pll pll, uint64_t freq, struct Si5351RegSe
 	ref_freq = ref_freq + (int32_t)((((((int64_t)correction) << 31) / 1000000000LL) * ref_freq) >> 31);
 
 	// PLL bounds checking
+	/*
 	if (freq < SI5351_PLL_VCO_MIN * SI5351_FREQ_MULT)
 	{
 		freq = SI5351_PLL_VCO_MIN * SI5351_FREQ_MULT;
@@ -1380,6 +1382,7 @@ uint64_t Si5351::pll_calc(enum si5351_pll pll, uint64_t freq, struct Si5351RegSe
 	{
 		freq = SI5351_PLL_VCO_MAX * SI5351_FREQ_MULT;
 	}
+*/
 
 	// Determine integer part of feedback equation
 	a = freq / ref_freq;
@@ -1437,6 +1440,21 @@ uint64_t Si5351::pll_calc(enum si5351_pll pll, uint64_t freq, struct Si5351RegSe
 	}
 }
 
+void Si5351::print(uint64_t value)
+{
+    const int NUM_DIGITS    = log10(value) + 1;
+
+    char sz[NUM_DIGITS + 1];
+    
+    sz[NUM_DIGITS] =  0;
+    for ( size_t i = NUM_DIGITS; i--; value /= 10)
+    {
+        sz[i] = '0' + (value % 10);
+    }
+    
+    Serial.println(sz);
+}
+
 uint64_t Si5351::multisynth_calc(uint64_t freq, uint64_t pll_freq, struct Si5351RegSet *reg)
 {
 	uint64_t lltmp;
@@ -1454,10 +1472,12 @@ uint64_t Si5351::multisynth_calc(uint64_t freq, uint64_t pll_freq, struct Si5351
 		freq = SI5351_MULTISYNTH_MIN_FREQ * SI5351_FREQ_MULT;
 	}
 
+/*
 	if (freq >= SI5351_MULTISYNTH_DIVBY4_FREQ * SI5351_FREQ_MULT)
 	{
 		divby4 = 1;
 	}
+*/
 
 	if(pll_freq == 0)
 	{
@@ -1505,6 +1525,9 @@ uint64_t Si5351::multisynth_calc(uint64_t freq, uint64_t pll_freq, struct Si5351
 
 		b = (pll_freq % freq * RFRAC_DENOM) / freq;
 		c = b ? RFRAC_DENOM : 1;
+		
+		Serial.print( "A = " );
+		print( a );
 	}
 
 	// Calculate parameters
